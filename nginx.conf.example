@@ -1,0 +1,41 @@
+# Nginx 配置示例
+# 用于部署到 https://ui.tad.woa.com/web/minna/ai-answer/
+
+location /web/minna/ai-answer/ {
+    # 静态文件目录
+    alias /path/to/your/dist/;
+    index index.html;
+    
+    # SPA 路由支持
+    try_files $uri $uri/ /web/minna/ai-answer/index.html;
+    
+    # 静态资源缓存
+    location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ {
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+    }
+}
+
+# API 代理配置
+location /web/minna/ai-answer/api/ {
+    # 代理到混元 API
+    proxy_pass http://hunyuanapi.woa.com/;
+    proxy_set_header Host hunyuanapi.woa.com;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    
+    # 超时设置
+    proxy_connect_timeout 60s;
+    proxy_send_timeout 60s;
+    proxy_read_timeout 60s;
+    
+    # 跨域支持（如果需要）
+    add_header Access-Control-Allow-Origin *;
+    add_header Access-Control-Allow-Methods 'GET, POST, OPTIONS';
+    add_header Access-Control-Allow-Headers 'DNT,X-Mx-ReqToken,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Authorization';
+    
+    if ($request_method = 'OPTIONS') {
+        return 204;
+    }
+}
