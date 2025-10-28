@@ -54,7 +54,7 @@ export async function generateAIAnswer(userQuestion: string): Promise<string> {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${HUNYUAN_API_KEY}`
+        'Authorization': `Bearer ${HUNYUAN_API_KEY}`,
       },
       body: JSON.stringify({
         model: HUNYUAN_MODEL,
@@ -74,7 +74,7 @@ export async function generateAIAnswer(userQuestion: string): Promise<string> {
     })
 
     if (!response.ok) {
-      throw new Error(`API请求失败: ${response.status}`)
+      throw new Error(`API请求失败: ${HUNYUAN_API_URL},${response.status}`)
     }
 
     const data = await response.json()

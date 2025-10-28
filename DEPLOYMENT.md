@@ -29,7 +29,7 @@ npm run build
    - 支持 SPA 路由
 
 2. **API 代理**：`/web/minna/ai-answer/api/`
-   - 代理到 `http://hunyuanapi.woa.com/`
+   - 代理到 `https://hunyuanapi.woa.com/`
    - 处理跨域问题
 
 ### 4. 部署步骤
