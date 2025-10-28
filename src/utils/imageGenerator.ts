@@ -1,75 +1,12 @@
-import { useState, useRef } from 'react'
-import { Toaster } from 'react-hot-toast'
-import { generateAIAnswer, generateMockAnswer } from './services/aiService'
-import {
-  Header,
-  QuestionInput,
-  AnswerDisplay,
-  Footer,
-  Toast
-} from './components'
+// 图片生成工具函数 - 与拍照功能保持一致的样式
 
-function App() {
-  const [question, setQuestion] = useState('')
-  const [isThinking, setIsThinking] = useState(false)
-  const [answer, setAnswer] = useState('')
-  const [showAnswer, setShowAnswer] = useState(false)
-  const [useAI, setUseAI] = useState(true)
-  const [toastMessage, setToastMessage] = useState('')
-  const cardRef = useRef<HTMLDivElement>(null)
+export interface ImageContent {
+  question: string
+  answer: string
+}
 
-  const handleAIToggle = () => {
-    setUseAI(!useAI)
-    setAnswer('')
-    setShowAnswer(false)
-  }
-
-  const handleReset = () => {
-    setShowAnswer(false)
-    setAnswer('')
-    setQuestion('')
-  }
-
-  const getAnswer = async () => {
-    // 防止重复触发和空问题
-    if (isThinking || !question.trim()) return
-
-    // 检查字数限制
-    if (question.length > 30) {
-      setToastMessage('问题不能超过30字，请精简后重试')
-      return
-    }
-
-    setIsThinking(true)
-    setShowAnswer(false)
-    setAnswer('')
-
-    try {
-      let aiAnswer: string
-      if (useAI) {
-        // 使用真实AI生成，传入用户问题
-        aiAnswer = await generateAIAnswer(question)
-      } else {
-        // 使用模拟数据
-        aiAnswer = await generateMockAnswer()
-      }
-      setAnswer(aiAnswer)
-      setIsThinking(false)
-      setShowAnswer(true)
-    } catch {
-      setAnswer("抱歉，生成答案时出现错误，请稍后再试。")
-      setIsThinking(false)
-      setShowAnswer(true)
-    }
-  }
-
-  const handleExceedLimit = () => {
-    setToastMessage('问题不能超过30字')
-  }
-  
-  const handlePhoto = async () => {
-    if (!answer || !question) return
-    
+export const generateAnswerImage = async (content: ImageContent): Promise<Blob> => {
+  return new Promise(async (resolve, reject) => {
     try {
       // 确保字体已加载
       await document.fonts.ready
@@ -84,7 +21,7 @@ function App() {
         throw new Error('无法创建 Canvas 上下文')
       }
       
-      // 随机渐变背景色组合
+      // 随机渐变背景色组合（与拍照功能完全一致）
       const gradientColors = [
         ['#f5f7fa', '#c3cfe2'], // 浅蓝灰
         ['#ffecd2', '#fcb69f'], // 暖橙
@@ -119,7 +56,7 @@ function App() {
       
       // 处理长文本换行
       const maxWidth = 1400
-      const words = question.split('')
+      const words = content.question.split('')
       let line = ''
       const lines: string[] = []
       
@@ -152,7 +89,7 @@ function App() {
       
       // 处理答案换行
       const answerMaxWidth = 1360
-      const answerWords = answer.split('')
+      const answerWords = content.answer.split('')
       let answerLine = ''
       const answerLines: string[] = []
       
@@ -201,71 +138,17 @@ function App() {
       ctx.fillText('答案之书 Agent 生成', 1520, 1540)
       ctx.restore()
       
-      // 下载图片
+      // 转换为blob
       canvas.toBlob((blob) => {
         if (blob) {
-          const url = URL.createObjectURL(blob)
-          const link = document.createElement('a')
-          link.href = url
-          link.download = `答案之书-${new Date().getTime()}.png`
-          document.body.appendChild(link)
-          link.click()
-          document.body.removeChild(link)
-          URL.revokeObjectURL(url)
+          resolve(blob)
         } else {
-          throw new Error('生成图片失败')
+          reject(new Error('生成图片失败'))
         }
       }, 'image/png')
       
     } catch (error) {
-      console.error('生成图片失败:', error)
-      alert(`生成图片失败: ${error instanceof Error ? error.message : '未知错误'}`)
+      reject(error)
     }
-  }
-
-  return (
-    <div className="min-h-screen flex items-center justify-center p-4">
-      <div className="max-w-2xl w-full">
-        <Header useAI={useAI} onToggle={handleAIToggle}/>
-
-        <div className="bg-white/50 backdrop-blur-2xl rounded-3xl p-8 shadow-[0px_10px_40px_rgba(0,0,0,0.05)]">
-          <div className="relative" ref={cardRef}>
-            {!showAnswer && !isThinking && (
-              <QuestionInput
-                question={question}
-                isThinking={isThinking}
-                onQuestionChange={setQuestion}
-                onSubmit={getAnswer}
-                onExceedLimit={handleExceedLimit}
-              />
-            )}
-
-            <AnswerDisplay
-              isThinking={isThinking}
-              showAnswer={showAnswer}
-              answer={answer}
-              question={question}
-              onReset={handleReset}
-              onPhoto={handlePhoto}
-            />
-          </div>
-        </div>
-
-        <Footer />
-      </div>
-
-      {/* Toast 提示 */}
-      {toastMessage && (
-        <Toast 
-          message={toastMessage} 
-          onClose={() => setToastMessage('')}
-        />
-      )}
-      
-      {/* React Hot Toast */}
-      <Toaster />
-    </div>
-  )
+  })
 }
-
-export default App
