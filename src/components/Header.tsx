@@ -4,22 +4,15 @@ type Props = {
     useAI: boolean
     onToggle: () => void
 }
-const Header:React.FC<Props> = ({
-    useAI,
-    onToggle
-}) =>  (
-    <div className="text-center mb-12">
-      <h1 className="text-6xl leading-none text-gray-800 mb-4 animate-fadeIn">
-        📖
-      </h1>
-      <h2 className="text-4xl font-serif text-gray-800 mb-2">
-        答案之书（<div className={`inline relative cursor-pointer ${useAI ? 'text-gray-800' : 'text-gray-400'}`} onClick={onToggle}>AI 版</div>）
-      </h2>
-      <p className="text-xl text-gray-800 font-light">
-        The AI-Powered Book of Answers.
-      </p>
-    </div>
-  )
+const Header: React.FC<Props> = ({}) => (
+  <div className="w-full gap-10 text-center flex items-center justify-center">
+    <div className="flex-1 h-px bg-gray-200"></div>
+    <h2 className="text-[10px] text-[rgba(0,0,0,0.5)] tracking-[20px]">
+      答案之书
+    </h2>
+    <div className="flex-1 h-px bg-gray-200"></div>
+  </div>
+);
 
 export default Header;
 

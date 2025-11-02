@@ -1,9 +1,11 @@
 export default function Footer() {
   return (
-    <div className="text-center mt-8">
-      <p className="text-gray-400 text-sm">
-        ✨ 让直觉指引你的方向 ✨
+    <div className="w-full flex items-center justify-center gap-10 mt-auto">
+      <div className="flex-1 h-px bg-gray-200"></div>
+      <p className="text-[10px] text-[rgba(0,0,0,0.5)] tracking-[1.25em]">
+        {new Date().toLocaleDateString()}
       </p>
+      <div className="flex-1 h-px bg-gray-200"></div>
     </div>
-  )
+  );
 }

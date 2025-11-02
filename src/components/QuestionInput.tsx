@@ -41,9 +41,10 @@ export default function QuestionInput({
 
   return (
     <div className="absolute w-full top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
-      <input 
-        className="appearance-none border-none shadow-none outline-none w-full leading-9 text-center bg-transparent text-black placeholder:text-gray-400 focus:border-none focus:shadow-none focus:outline-none" 
-        value={question} 
+      <input
+        className="appearance-none border-none shadow-none outline-none w-full text-[64px] leading-9 text-center bg-transparent text-black placeholder:text-[rgba(0,0,0,0.4)] focus:border-none focus:shadow-none focus:outline-none"
+        style={{ fontFamily: "MFBoHeHaiYan" }}
+        value={question}
         onChange={handleChange}
         onKeyDown={handleKeyDown}
         placeholder="输入你的问题，回车获取答案（限30字）"
@@ -51,12 +52,14 @@ export default function QuestionInput({
         autoFocus
       />
       {question.length > 0 && (
-        <div className={`text-center mt-2 text-xs transition-colors ${
-          isExceeded ? 'text-red-500' : 'text-gray-400'
-        }`}>
-          {isExceeded ? `超出 ${Math.abs(remainingChars)} 字` : ''}
+        <div
+          className={`text-center mt-2 text-xs transition-colors ${
+            isExceeded ? "text-red-500" : "text-gray-400"
+          }`}
+        >
+          {isExceeded ? `超出 ${Math.abs(remainingChars)} 字` : ""}
         </div>
       )}
     </div>
-  )
+  );
 }

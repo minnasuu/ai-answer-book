@@ -3,10 +3,9 @@
 #root{
   width: 100vw;
 }
-
 @font-face {
-  font-family: 'Momozhuanji';
-  src: url('/public/Momozhuanji.ttf');
+  font-family: 'MFBoHeHaiYan';
+  src: url('/public/MFBoHeHaiYan.otf');
 }
 @font-face {
   font-family: 'kenpixel';
@@ -14,7 +13,7 @@
 }
 @layer base {
   body {
-    @apply font-serif leading-relaxed text-white bg-gray-100 min-h-screen flex items-center justify-center p-4;
+    @apply leading-relaxed text-white bg-gray-100 min-h-screen flex items-center justify-center;
   }
 }
 
