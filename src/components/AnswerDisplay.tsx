@@ -1,92 +1,50 @@
-import { useState, useEffect, useRef } from 'react'
-import toast from 'react-hot-toast'
-import { generateAnswerImage } from '../utils/imageGenerator'
+import { useState, useEffect, useRef } from "react";
 
 interface AnswerDisplayProps {
-  isThinking: boolean
-  showAnswer: boolean
-  answer: string
-  question: string
-  onReset: () => void
-  onPhoto: () => void
+  isThinking: boolean;
+  showAnswer: boolean;
+  answer: string;
+  question: string;
+  onReset: () => void;
+  onPhoto: () => void;
+  onCopy: () => void;
 }
 
-export default function AnswerDisplay({ 
-  isThinking, 
-  showAnswer, 
+export default function AnswerDisplay({
+  isThinking,
+  showAnswer,
   answer,
   question,
   onReset,
-  onPhoto
+  onPhoto,
+  onCopy,
 }: AnswerDisplayProps) {
-  const [displayedText, setDisplayedText] = useState('')
-  const [showButton, setShowButton] = useState(false)
-  const answerRef = useRef<HTMLDivElement>(null)
-
-  // 复制图片功能 - 优先使用Canvas方案
-  const copyAsImage = async () => {
-    try {
-      // 使用Canvas直接生成图片
-      const blob = await generateAnswerImage({
-        question,
-        answer
-      })
-
-      // 复制到剪贴板
-      await navigator.clipboard.write([
-        new ClipboardItem({ 'image/png': blob })
-      ])
-      
-      toast.success('图片已复制到剪贴板！', {
-        duration: 2000,
-        position: 'top-center',
-        style: {
-          background: 'white',
-          color: '#333',
-          border: '1px solid #e5e5e5',
-          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)'
-        }
-      })
-      
-    } catch (error) {
-      console.error('复制图片失败:', error)
-      toast.error('复制失败，请重试', {
-        duration: 2000,
-        position: 'top-center',
-        style: {
-          background: 'white',
-          color: '#333',
-          border: '1px solid #e5e5e5',
-          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)'
-        }
-      })
-    }
-  }
-
-
+  const [displayedText, setDisplayedText] = useState("");
+  const [showButton, setShowButton] = useState(false);
+  const answerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (showAnswer && answer) {
       // 重置状态
-      setDisplayedText('')
-      setShowButton(false)
-      
+      setDisplayedText("");
+      setShowButton(false);
+
       // 逐字显示效果
-      let currentIndex = 0
+      let currentIndex = 0;
       const interval = setInterval(() => {
         if (currentIndex <= answer.length) {
-          setDisplayedText(answer.slice(0, currentIndex))
-          currentIndex++
+          setDisplayedText(answer.slice(0, currentIndex));
+          currentIndex++;
         } else {
-          clearInterval(interval)
+          clearInterval(interval);
           // 文字显示完成后，延迟显示按钮
-          setTimeout(() => setShowButton(true), 300)
+          setTimeout(() => setShowButton(true), 300);
         }
-      }, 50) // 每50ms显示一个字符
+      }, 50); // 每50ms显示一个字符
 
-      return () => clearInterval(interval)
+      return () => clearInterval(interval);
     }
-  }, [showAnswer, answer])
+  }, [showAnswer, answer]);
 
   return (
     <div
@@ -197,7 +155,7 @@ export default function AnswerDisplay({
             </svg>
           </button>
           <button
-            onClick={copyAsImage}
+            onClick={onCopy}
             className="hover:-translate-y-0.5 transition-transform cursor-pointer"
             title="复制图片到剪贴板"
           >
