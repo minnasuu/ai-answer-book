@@ -21,38 +21,34 @@ export const generateAnswerImage = async (content: ImageContent): Promise<Blob> 
         throw new Error('无法创建 Canvas 上下文')
       }
       
-      // 随机渐变背景色组合（与拍照功能完全一致）
-      const gradientColors = [
-        ['#f5f7fa', '#c3cfe2'], // 浅蓝灰
-        ['#ffecd2', '#fcb69f'], // 暖橙
-        ['#e0c3fc', '#8ec5fc'], // 紫蓝
-        ['#fbc2eb', '#a6c1ee'], // 粉紫
-        ['#fdcbf1', '#e6dee9'], // 粉灰
-        ['#a1c4fd', '#c2e9fb'], // 天蓝
-        ['#ffd1ff', '#ffeaa7'], // 粉黄
-        ['#cfd9df', '#e2ebf0'], // 冷灰
-        ['#ffeaa7', '#fdcb6e'], // 金黄
-        ['#dfe6e9', '#b2bec3'], // 银灰
-        ['#fab1a0', '#ffeaa7'], // 橙黄
-        ['#a29bfe', '#dfe6e9'], // 紫灰
-      ]
-      
-      // 随机选择一组颜色
-      const randomColors = gradientColors[Math.floor(Math.random() * gradientColors.length)]
-      
-      // 绘制渐变背景
-      const gradient = ctx.createLinearGradient(0, 0, 1600, 1600)
-      gradient.addColorStop(0, randomColors[0])
-      gradient.addColorStop(1, randomColors[1])
-      ctx.fillStyle = gradient
+      // 白色背景
+      ctx.fillStyle = '#F1F4FB'
       ctx.fillRect(0, 0, 1600, 1600)
       
-      // 绘制背景问题（大字、半透明）
+      // 计算背景文字字号（与AnswerDisplay保持一致）
+      const questionLength = content.question.length
+      const baseFontSize = questionLength > 0 
+        ? Math.max(200, Math.min(300, 300 - (questionLength - 1) * 10))
+        : 300
+      
+      // 绘制背景问题（带渐变色和模糊效果）
       ctx.save()
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.08)'
-      ctx.font = 'bold 200px MFBoHeHaiYan, serif'
+      
+      // 创建渐变色
+      const textGradient = ctx.createLinearGradient(0, 0, 1600, 0)
+      textGradient.addColorStop(0.2485, '#FFF3D7')
+      textGradient.addColorStop(0.4866, '#FFFFEF')
+      textGradient.addColorStop(0.6338, '#D1FEFF')
+      textGradient.addColorStop(0.6854, '#D7E5FF')
+      textGradient.addColorStop(0.759, '#FFD8FF')
+      
+      ctx.fillStyle = textGradient
+      ctx.font = `bold ${baseFontSize}px MFBoHeHaiYan, serif`
       ctx.textAlign = 'center'
       ctx.textBaseline = 'middle'
+      
+      // 应用模糊效果（Canvas的filter属性）
+      ctx.filter = 'blur(4px)'
       
       // 处理长文本换行
       const maxWidth = 1400
@@ -72,8 +68,8 @@ export const generateAnswerImage = async (content: ImageContent): Promise<Blob> 
       }
       lines.push(line)
       
-      // 绘制背景问题文字
-      const lineHeight = 240
+      // 绘制背景问题文字（使用渐变色）
+      const lineHeight = baseFontSize * 1.2
       const startY = 800 - ((lines.length - 1) * lineHeight) / 2
       lines.forEach((line, index) => {
         ctx.fillText(line, 800, startY + index * lineHeight)
@@ -82,13 +78,14 @@ export const generateAnswerImage = async (content: ImageContent): Promise<Blob> 
       
       // 绘制答案文字（前景、清晰）
       ctx.save()
-      ctx.fillStyle = '#1a1a1a'
-      ctx.font = '500 84px MFBoHeHaiYan, serif'
+      ctx.fillStyle = '#111827' // text-gray-900
+      ctx.font = '500 128px MFBoHeHaiYan, serif' // 对应64px * 2 (retina)
       ctx.textAlign = 'center'
       ctx.textBaseline = 'middle'
+      ctx.filter = 'none' // 确保答案文字不模糊
       
       // 处理答案换行
-      const answerMaxWidth = 1360
+      const answerMaxWidth = 1400
       const answerWords = content.answer.split('')
       let answerLine = ''
       const answerLines: string[] = []
@@ -105,8 +102,8 @@ export const generateAnswerImage = async (content: ImageContent): Promise<Blob> 
       }
       answerLines.push(answerLine)
       
-      // 绘制答案文字
-      const answerLineHeight = 120
+      // 绘制答案文字 (leading-[1.15em])
+      const answerLineHeight = 128 * 1.15
       const answerStartY = 800 - ((answerLines.length - 1) * answerLineHeight) / 2
       answerLines.forEach((line, index) => {
         ctx.fillText(line, 800, answerStartY + index * answerLineHeight)
@@ -115,9 +112,10 @@ export const generateAnswerImage = async (content: ImageContent): Promise<Blob> 
       
       // 绘制右下角水印
       ctx.save()
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.4)'
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.3)'
       ctx.textAlign = 'right'
       ctx.textBaseline = 'bottom'
+      ctx.filter = 'none'
       
       // 格式化时间：YYYY-MM-DD HH:mm:ss
       const now = new Date()
@@ -130,12 +128,12 @@ export const generateAnswerImage = async (content: ImageContent): Promise<Blob> 
       const timeString = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`
       
       // 绘制时间（上方，使用 kenpixel 字体）
-      ctx.font = '24px kenpixel, monospace'
-      ctx.fillText(timeString, 1520, 1510)
+      ctx.font = '28px kenpixel, monospace'
+      ctx.fillText(timeString, 1540, 1520)
       
       // 绘制来源（下方，使用 sans-serif 字体）
-      ctx.font = '24px sans-serif'
-      ctx.fillText('答案之书 Agent 生成', 1520, 1540)
+      ctx.font = '28px sans-serif'
+      ctx.fillText('答案之书 Agent 生成', 1540, 1560)
       ctx.restore()
       
       // 转换为blob
