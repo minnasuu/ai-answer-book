@@ -52,16 +52,17 @@ export default function AnswerDisplay({
       style={{ fontFamily: "MFBoHeHaiYan" }}
     >
       {isThinking && (
-        <div className="flex flex-col items-center gap-4 z-1">
-          <p className="text-[rgba(0,0,0,0.4)] text-[64px] animate-pulse">
-            命运之书正在翻阅.
+        <div className="flex items-center gap-8 z-1">
+          <p className="text-black text-[64px]">
+            命运之书正在翻阅
           </p>
+          <div className="loading-dots"></div>
         </div>
       )}
       {/* 背景问题 - 弱化显示 */}
       {
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-          <p
+         <p
             className="text-gray-300/50 leading-[1em] text-center select-none animate-fadeIn"
             style={{
               fontFamily: "MFBoHeHaiYan",
@@ -71,7 +72,7 @@ export default function AnswerDisplay({
                       200,
                       Math.min(300, 300 - (question.length - 1) * 10)
                     )
-                  : 300
+                  : 600
               }px`,
               background:
                 "linear-gradient(90deg, #FFF3D7 24.85%, #FFFFEF 48.66%, #D1FEFF 63.38%, #D7E5FF 68.54%, #FFD8FF 75.9%)",
@@ -81,11 +82,14 @@ export default function AnswerDisplay({
               filter: "blur(4px)",
             }}
           >
-            {question || "?"}
+            {question}
           </p>
+          {question.length === 0 && <div className="absolute w-[253px] h-[448px]" >
+            <img src="question.png" alt="question-bg" className="w-full h-full" />
+          </div>}
         </div>
       }
-      {showAnswer && answer && (
+      {showAnswer && answer && !isThinking && (
         <div className="relative z-10" ref={answerRef}>
           {/* 答案文字 */}
           <p
